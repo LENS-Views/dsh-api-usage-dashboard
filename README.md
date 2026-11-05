@@ -7,6 +7,8 @@
 [中文](#-中文) · [English](#-english)
 
 ![license](https://img.shields.io/badge/license-MIT-blue)
+![npm](https://img.shields.io/npm/v/dsh-api-usage-dashboard)
+![downloads](https://img.shields.io/npm/dm/dsh-api-usage-dashboard)
 ![platform](https://img.shields.io/badge/DSH-Web%20%26%20Desktop-4d6bfe)
 ![deps](https://img.shields.io/badge/dependencies-0-10b981)
 ![privacy](https://img.shields.io/badge/data-stays%20local-f59e0b)
@@ -50,11 +52,13 @@
 
 ### 三步装上
 
-1. 把本仓库放到本地任意目录
-2. 在 DSH 里用插件管理器安装该目录（`plugin_manager → install_bundle`）
+1. 在 DSH 的插件管理器里选 **install_bundle**
+2. 输入包名 **`dsh-api-usage-dashboard`**（已发布到 npm），也可以指向本地目录
 3. 侧边栏点柱状图图标 → 完成
 
 首次打开会扫一遍全部会话日志（23 个会话约 1–2 秒），之后走缓存，基本秒开。
+
+> 不想用 npm 也行：把仓库拷到本地，用目录路径安装，效果一样。
 
 ### 统计口径
 
@@ -145,11 +149,18 @@ A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) plug
 
 ### Quick start
 
-1. Clone or copy this repository to a local folder
-2. Install that folder through DSH's plugin manager (`plugin_manager → install_bundle`)
+```bash
+# inside DeepSeek Harness: plugin manager → install_bundle
+dsh-api-usage-dashboard
+```
+
+1. Open DSH's plugin manager and choose **install_bundle**
+2. Enter the package name **`dsh-api-usage-dashboard`** (published on npm), or point it at a local folder
 3. Click the bar-chart icon in the sidebar
 
 The first open scans every session log (about 1–2 s for 23 sessions), then serves from cache.
+
+> No npm needed: copy the repository locally and install that folder instead.
 
 ### What is counted
 

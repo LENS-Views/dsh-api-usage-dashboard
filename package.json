@@ -1,6 +1,6 @@
 {
   "name": "dsh-api-usage-dashboard",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "DSH (DeepSeek Harness) plugin: a zero-config API usage dashboard — 24-hour bar chart, per-day drill-down, per-provider and per-model colors, aggregated from local session logs.",
   "type": "module",
   "license": "MIT",
@@ -11,7 +11,6 @@
     }
   ],
   "homepage": "https://github.com/LENS-Views/dsh-api-usage-dashboard#readme",
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LENS-Views/dsh-api-usage-dashboard.git"
