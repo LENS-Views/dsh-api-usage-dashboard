@@ -8,6 +8,18 @@ window.__ModuleLoader__.load({
     const RANGE_IDS = ['today', '7d', '30d', 'all']
     const REFRESH_MS = 60000
 
+    // Data-series palette. Chart colors are series identity, not UI chrome, so
+    // they stay literal: mid-tone hues that read on both light and dark hosts.
+    const PALETTE = ['#4d6bfe', '#10b981', '#8b5cf6', '#f59e0b', '#ef4444', '#06b6d4', '#ec4899', '#84cc16']
+    const METRIC_COLOR = { total: PALETTE[0], requests: PALETTE[3] }
+    const STAT_COLOR = {
+      requests: PALETTE[3],
+      total: PALETTE[0],
+      input: PALETTE[1],
+      cache: PALETTE[2],
+      output: PALETTE[4],
+    }
+
     const dicts = {
       zh: {
         'panel.title': 'API 用量',
@@ -163,7 +175,8 @@ window.__ModuleLoader__.load({
 .au_cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 .au_card { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 12px;
   background: var(--dsw-alias-bg-layer-1); border: 1px solid var(--dsw-alias-border-l1); }
-.au_cardLabel { font-size: 12px; color: var(--dsw-alias-label-secondary); }
+.au_cardLabel { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--dsw-alias-label-secondary); }
+.au_dot { display: inline-block; flex: none; width: 7px; height: 7px; border-radius: 50%; }
 .au_cardValue { font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
 .au_cardSub { font-size: 11px; color: var(--dsw-alias-label-secondary); }
 .au_section { display: flex; flex-direction: column; gap: 8px; }
@@ -204,7 +217,7 @@ window.__ModuleLoader__.load({
 .au_modelCard { padding: 12px 14px; border-radius: 12px; background: var(--dsw-alias-bg-layer-1);
   border: 1px solid var(--dsw-alias-border-l1); }
 .au_modelHead { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
-.au_modelName { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.au_modelName { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .au_modelMeta { font-size: 11px; color: var(--dsw-alias-label-secondary); white-space: nowrap; }
 .au_table { border-radius: 12px; overflow-x: auto; background: var(--dsw-alias-bg-layer-1);
   border: 1px solid var(--dsw-alias-border-l1); }
@@ -314,20 +327,24 @@ window.__ModuleLoader__.load({
       return Math.max(0, total - input - output)
     }
 
-    function shareBar(ratio) {
+    function shareBar(ratio, color) {
       const pct = Math.max(0, Math.min(100, (Number(ratio) || 0) * 100))
       const label = pct <= 0 ? '—' : pct < 1 ? '<1%' : Math.round(pct) + '%'
       return h('div', { className: 'au_share' },
         h('span', { className: 'au_shareLabel' }, label),
         h('span', { className: 'au_shareTrack' },
-          h('span', { className: 'au_shareFill', style: { width: pct + '%' } })))
+          h('span', {
+            className: 'au_shareFill',
+            style: { width: pct + '%', background: color },
+          })))
     }
 
     /** One bar chart: hover/click tooltip, axis ticks and gridlines. */
-    function BarChart({ buckets, hourly, metric, chinese, t, mini }) {
+    function BarChart({ buckets, hourly, metric, chinese, t, mini, color }) {
       const [hover, setHover] = React.useState(-1)
       const [pinned, setPinned] = React.useState(-1)
       const valueOf = (bucket) => (metric === 'requests' ? bucket.requests : bucket.total)
+      const barColor = color ?? (metric === 'requests' ? METRIC_COLOR.requests : METRIC_COLOR.total)
       const height = mini ? 64 : 150
       let peak = 0
       for (const bucket of buckets) if (valueOf(bucket) > peak) peak = valueOf(bucket)
@@ -344,6 +361,7 @@ window.__ModuleLoader__.load({
         style: {
           left: 'clamp(64px, ' + pctOf(active) + '%, calc(100% - 64px))',
           bottom: 'calc(' + Math.max(4, (valueOf(bucket) / max) * 100) + '% + 8px)',
+          borderLeft: '3px solid ' + barColor,
         },
       },
       hourly
@@ -388,10 +406,13 @@ window.__ModuleLoader__.load({
               className: 'au_bar',
               'data-active': active === index ? 'true' : undefined,
               'data-empty': value === 0 ? 'true' : undefined,
-              style: { height: barHeight + '%' },
+              style: { height: barHeight + '%', background: value > 0 ? barColor : undefined },
             }))
           })),
-          active >= 0 ? h('span', { className: 'au_guide', style: { left: pctOf(active) + '%' } }) : null,
+          active >= 0 ? h('span', {
+            className: 'au_guide',
+            style: { left: pctOf(active) + '%', borderColor: barColor, opacity: 0.55 },
+          }) : null,
           tip),
         ),
         mini ? null : h('div', { className: 'au_xaxis' }, buckets.map((entry, index) => {
@@ -541,12 +562,18 @@ window.__ModuleLoader__.load({
             type: 'button',
             className: 'au_segBtn',
             'data-active': metric === 'total' ? 'true' : undefined,
+            style: metric === 'total'
+              ? { color: METRIC_COLOR.total, background: METRIC_COLOR.total + '1f' }
+              : { color: METRIC_COLOR.total },
             onClick: () => setMetric('total'),
           }, t('metric.tokens')),
           h('button', {
             type: 'button',
             className: 'au_segBtn',
             'data-active': metric === 'requests' ? 'true' : undefined,
+            style: metric === 'requests'
+              ? { color: METRIC_COLOR.requests, background: METRIC_COLOR.requests + '1f' }
+              : { color: METRIC_COLOR.requests },
             onClick: () => setMetric('requests'),
           }, t('metric.requests')))
 
@@ -567,28 +594,29 @@ window.__ModuleLoader__.load({
         } else {
           const totals = data.totals
           const models = Array.isArray(data.modelSeries) ? data.modelSeries : []
+          // Series colors: one hue per provider and per model, reused by the
+          // table and the per-model mini charts so the same row reads the same.
+          const colors = new Map()
+          data.providers.forEach((provider, index) => {
+            colors.set('p:' + provider.provider, PALETTE[index % PALETTE.length])
+          })
+          models.forEach((model, index) => {
+            colors.set('m:' + model.provider + ':' + model.model, PALETTE[(index + 3) % PALETTE.length])
+          })
+          const colorOf = (key, fallback) => colors.get(key) ?? fallback
+          const card = (label, value, sub, color, title) => h('div', { className: 'au_card' },
+            h('div', { className: 'au_cardLabel' },
+              h('span', { className: 'au_dot', style: { background: color } }),
+              label),
+            h('div', { className: 'au_cardValue', title }, value),
+            h('div', { className: 'au_cardSub' }, sub))
           body = h(React.Fragment, null,
             h('section', { className: 'au_cards' },
-              h('div', { className: 'au_card' },
-                h('div', { className: 'au_cardLabel' }, t('stat.requests')),
-                h('div', { className: 'au_cardValue' }, formatCompact(totals.requests, chinese)),
-                h('div', { className: 'au_cardSub' }, t('stat.requests.sub'))),
-              h('div', { className: 'au_card' },
-                h('div', { className: 'au_cardLabel' }, t('stat.total')),
-                h('div', { className: 'au_cardValue', title: formatExact(totals.total, chinese) + ' tokens' }, formatCompact(totals.total, chinese)),
-                h('div', { className: 'au_cardSub' }, t('stat.total.sub'))),
-              h('div', { className: 'au_card' },
-                h('div', { className: 'au_cardLabel' }, t('stat.input')),
-                h('div', { className: 'au_cardValue', title: formatExact(totals.input, chinese) + ' tokens' }, formatCompact(totals.input, chinese)),
-                h('div', { className: 'au_cardSub' }, t('stat.input.sub'))),
-              h('div', { className: 'au_card' },
-                h('div', { className: 'au_cardLabel' }, t('stat.cache')),
-                h('div', { className: 'au_cardValue', title: formatExact(totals.cacheRead, chinese) + ' tokens' }, formatCompact(totals.cacheRead, chinese)),
-                h('div', { className: 'au_cardSub' }, t('stat.cache.sub'))),
-              h('div', { className: 'au_card' },
-                h('div', { className: 'au_cardLabel' }, t('stat.output')),
-                h('div', { className: 'au_cardValue', title: formatExact(totals.output, chinese) + ' tokens' }, formatCompact(totals.output, chinese)),
-                h('div', { className: 'au_cardSub' }, t('stat.output.sub')))),
+              card(t('stat.requests'), formatCompact(totals.requests, chinese), t('stat.requests.sub'), STAT_COLOR.requests),
+              card(t('stat.total'), formatCompact(totals.total, chinese), t('stat.total.sub'), STAT_COLOR.total, formatExact(totals.total, chinese) + ' tokens'),
+              card(t('stat.input'), formatCompact(totals.input, chinese), t('stat.input.sub'), STAT_COLOR.input, formatExact(totals.input, chinese) + ' tokens'),
+              card(t('stat.cache'), formatCompact(totals.cacheRead, chinese), t('stat.cache.sub'), STAT_COLOR.cache, formatExact(totals.cacheRead, chinese) + ' tokens'),
+              card(t('stat.output'), formatCompact(totals.output, chinese), t('stat.output.sub'), STAT_COLOR.output, formatExact(totals.output, chinese) + ' tokens')),
             h('section', { className: 'au_section' },
               h('div', { className: 'au_chart' },
                 h('div', { className: 'au_chartHead' },
@@ -597,33 +625,48 @@ window.__ModuleLoader__.load({
                     h('span', { className: 'au_chartSub' },
                       scopeLabel + ' · ' + (hourly ? t('chart.sub.hour') : t('chart.sub.day')) + ' · ' + formatExact(totalOf, chinese))),
                   metricSwitch),
-                h(BarChart, { buckets, hourly, metric, chinese, t, mini: false })),
-              models.length === 0 ? null : h('section', { className: 'au_section' },
-                h('h2', { className: 'au_sectionTitle' }, t('models.title')),
-                h('div', { className: 'au_models' }, models.map((model) => h('div', {
-                  key: model.provider + ':' + model.model,
-                  className: 'au_modelCard',
-                },
-                h('div', { className: 'au_modelHead' },
-                  h('span', { className: 'au_modelName', title: model.provider + ' / ' + model.model }, model.model),
-                  h('span', { className: 'au_modelMeta' },
-                    t('models.requests', { value: formatExact(model.requests, chinese) }) + ' · ' +
-                    t('models.tokens', { value: formatCompact(model.total, chinese) }))),
                 h(BarChart, {
-                  buckets: model.hourly.map((slot, hour) => ({
-                    key: String(hour).padStart(2, '0'),
-                    requests: slot.requests,
-                    total: slot.total,
-                  })),
-                  hourly: true,
+                  buckets,
+                  hourly,
                   metric,
                   chinese,
                   t,
-                  mini: true,
-                })))))),
+                  mini: false,
+                  color: metric === 'requests' ? METRIC_COLOR.requests : METRIC_COLOR.total,
+                })),
+              models.length === 0 ? null : h('section', { className: 'au_section' },
+                h('h2', { className: 'au_sectionTitle' }, t('models.title')),
+                h('div', { className: 'au_models' }, models.map((model) => {
+                  const modelKey = 'm:' + model.provider + ':' + model.model
+                  const modelColor = colorOf(modelKey, PALETTE[3])
+                  return h('div', {
+                    key: model.provider + ':' + model.model,
+                    className: 'au_modelCard',
+                  },
+                  h('div', { className: 'au_modelHead' },
+                    h('span', { className: 'au_modelName', title: model.provider + ' / ' + model.model },
+                      h('span', { className: 'au_dot', style: { background: modelColor } }),
+                      model.model),
+                    h('span', { className: 'au_modelMeta' },
+                      t('models.requests', { value: formatExact(model.requests, chinese) }) + ' · ' +
+                      t('models.tokens', { value: formatCompact(model.total, chinese) }))),
+                  h(BarChart, {
+                    buckets: model.hourly.map((slot, hour) => ({
+                      key: String(hour).padStart(2, '0'),
+                      requests: slot.requests,
+                      total: slot.total,
+                    })),
+                    hourly: true,
+                    metric,
+                    chinese,
+                    t,
+                    mini: true,
+                    color: modelColor,
+                  }))
+                })))),
             h('section', { className: 'au_section' },
               h('h2', { className: 'au_sectionTitle' }, t('table.title')),
-              h('div', { className: 'au_table' }, tableRows(data, chinese, t))))
+              h('div', { className: 'au_table' }, tableRows(data, chinese, t, colorOf))))
         }
 
         const foot = data === null ? null : h('footer', { className: 'au_foot' },
@@ -637,29 +680,35 @@ window.__ModuleLoader__.load({
           h('div', { className: 'au_inner' }, head, toolbar, alert, body, foot))
       }
 
-      function tableRows(data, chinese, t) {
+      function tableRows(data, chinese, t, colorOf) {
         const shareBase = Math.max(1, data.totals.total)
         const rows = []
         for (const provider of data.providers) {
           const providerCache = cacheTokensOf(provider)
+          const providerColor = colorOf('p:' + provider.provider, PALETTE[0])
           rows.push(h('div', { key: 'p:' + provider.provider, className: 'au_tr au_trProvider' },
-            h('div', { className: 'au_td au_tdName' }, h('span', { className: 'au_provider' }, provider.provider)),
+            h('div', { className: 'au_td au_tdName' },
+              h('span', { className: 'au_dot', style: { background: providerColor } }),
+              h('span', { className: 'au_provider' }, provider.provider)),
             h('div', { className: 'au_td au_num', title: formatExact(provider.requests, chinese) }, formatCompact(provider.requests, chinese)),
             h('div', { className: 'au_td au_num', title: formatExact(provider.input, chinese) }, formatCompact(provider.input, chinese)),
             h('div', { className: 'au_td au_num', title: formatExact(providerCache, chinese) }, formatCompact(providerCache, chinese)),
             h('div', { className: 'au_td au_num', title: formatExact(provider.output, chinese) }, formatCompact(provider.output, chinese)),
             h('div', { className: 'au_td au_num au_strong', title: formatExact(provider.total, chinese) }, formatCompact(provider.total, chinese)),
-            h('div', { className: 'au_td' }, shareBar(provider.total / shareBase))))
+            h('div', { className: 'au_td' }, shareBar(provider.total / shareBase, providerColor))))
           for (const model of provider.models) {
             const modelCache = cacheTokensOf(model)
+            const modelColor = colorOf('m:' + provider.provider + ':' + model.model, providerColor)
             rows.push(h('div', { key: 'm:' + provider.provider + ':' + model.model, className: 'au_tr' },
-              h('div', { className: 'au_td au_tdName au_indent', title: model.model }, model.model),
+              h('div', { className: 'au_td au_tdName au_indent', title: model.model },
+                h('span', { className: 'au_dot', style: { background: modelColor } }),
+                model.model),
               h('div', { className: 'au_td au_num', title: formatExact(model.requests, chinese) }, formatCompact(model.requests, chinese)),
               h('div', { className: 'au_td au_num', title: formatExact(model.input, chinese) }, formatCompact(model.input, chinese)),
               h('div', { className: 'au_td au_num', title: formatExact(modelCache, chinese) }, formatCompact(modelCache, chinese)),
               h('div', { className: 'au_td au_num', title: formatExact(model.output, chinese) }, formatCompact(model.output, chinese)),
               h('div', { className: 'au_td au_num', title: formatExact(model.total, chinese) }, formatCompact(model.total, chinese)),
-              h('div', { className: 'au_td' }, shareBar(model.total / shareBase))))
+              h('div', { className: 'au_td' }, shareBar(model.total / shareBase, modelColor))))
           }
         }
         const columns = [
