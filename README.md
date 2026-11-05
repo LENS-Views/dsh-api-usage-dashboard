@@ -1,97 +1,191 @@
+<div align="center">
+
 # DSH API Usage Dashboard
 
-DeepSeek Harness（DSH）插件：一个**仪表盘面板**，用来监控本机所有模型 API 的用量——按 provider / 模型拆分，按小时或按天查看调用次数与 token 消耗。
+**你的模型 API 用了多少，一屏看完 · Know exactly where your tokens go**
 
-零配置：插件从本地会话日志里读 Harness 实际发出的模型调用，**你新接入的 API 提供方会自动出现**，不需要在这里登记接口地址或密钥。
+[中文](#-中文) · [English](#-english)
 
-> A DSH dashboard panel that monitors model API usage per provider and model. Zero configuration: it reads what Harness actually sent from local session logs, so any provider you add later shows up automatically.
+![license](https://img.shields.io/badge/license-MIT-blue)
+![platform](https://img.shields.io/badge/DSH-Web%20%26%20Desktop-4d6bfe)
+![deps](https://img.shields.io/badge/dependencies-0-10b981)
+![privacy](https://img.shields.io/badge/data-stays%20local-f59e0b)
 
-<!-- 截图：把图放到 docs/screenshot.png 后取消下一行注释 -->
+</div>
+
+---
+
+## 🇨🇳 中文
+
+### 装完就有数据，不用配任何东西
+
+这是一个 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)（DSH）插件。装上之后，左侧边栏多一个图标，点开就是你的**模型 API 用量仪表盘**——每个 provider、每个模型、每个小时，调用了多少次、烧了多少 token。
+
+> 不需要填接口地址，不需要贴 API key，不需要另接 Prometheus / Langfuse。
+> 插件直接读 Harness 自己的会话记录，**你以后新接任何一家模型，第一次调用就会自动出现在图里。**
+
+### 为什么是它
+
+| 常见做法 | 痛点 | 这个插件 |
+| --- | --- | --- |
+| 登录各家控制台看账单 | 要一个个平台切，且只能看到总额 | 一个面板汇总所有 provider |
+| 接 Langfuse / Helicone 等平台 | 要改代码、要出网、有延迟 | 零侵入，装完即用 |
+| 自己写脚本解析日志 | 要维护、没界面、不能下钻 | 现成的 24 小时图 + 按天钻取 |
+
+**你的数据一步都不出门**：没有外部请求、不读取 API key、只在本机开一个 loopback 路由。
+
+### 功能
+
+- 🕐 **24 小时柱状图**：固定 00:00–23:00 全刻度，没调用的时段留空槽，图形不会因为"一天只有几小时"而失真
+- 📅 **按天钻取**：日期选择器 + 最近 7 天快捷标签，随时回看某一天的小时分布
+- 🖱️ **完全可交互**：悬停出虚线定位线 + 气泡（时间段 / tokens / 请求数），点击可钉住柱子对照
+- 🔀 **Tokens / 请求次数** 一键切换，Y 轴自动取整（1/2/5×10ⁿ）+ 网格线
+- 🎨 **彩色系列**：Tokens 蓝 / 请求 琥珀；每个 provider、每个模型各有固定颜色，颜色贯穿卡片、迷你图、明细表
+- 📊 **按模型分组**：每个模型一张 24 小时迷你柱图，看谁在烧 token 一目了然
+- 🧾 **明细表**：provider 汇总 + 模型明细，调用 / 输入 / 缓存 / 输出 / 合计 / 占比一目了然
+- 🌗 跟随宿主主题、中英双语、60 秒自动刷新
+
+<!-- 截图：把图放进 docs/screenshot.png 后，取消下面这行注释 -->
 <!-- ![screenshot](docs/screenshot.png) -->
 
-## 功能
+### 三步装上
 
-- **24 小时柱状图**：选「今日」时固定 00:00–23:00 全刻度，没调用的时段留空槽
-- **按天钻取**：日期选择器 + 最近 7 天快捷标签，可回看任意一天的小时分布
-- **柱状图可交互**：悬停显示虚线定位线与气泡（时间段 / tokens / 请求数），点击钉住柱子对照
-- **Tokens / 请求次数** 一键切换，Y 轴自动取整（1/2/5×10ⁿ）并带网格线
-- **按模型分组**：每个模型一张 24 小时迷你柱图，模型与 provider 各有固定配色，颜色贯穿卡片、图表与表格
-- **指标卡**：调用次数、Tokens 合计、输入、缓存命中、输出
-- **明细表**：provider 汇总 + 模型明细，含占比条
-- 60 秒自动刷新、中英双语、跟随宿主深浅色主题
+1. 把本仓库放到本地任意目录
+2. 在 DSH 里用插件管理器安装该目录（`plugin_manager → install_bundle`）
+3. 侧边栏点柱状图图标 → 完成
 
-## 安装
+首次打开会扫一遍全部会话日志（23 个会话约 1–2 秒），之后走缓存，基本秒开。
 
-作为本地目录安装（开发或自用）：
+### 统计口径
 
-```
-plugin_manager install_bundle → 指向本目录的绝对路径
-```
-
-发布到 npm 后：
-
-```
-plugin_manager install_bundle → dsh-api-usage-dashboard
-```
-
-安装后，左侧边栏出现柱状图图标；点开即打开「API 用量」面板。
-
-## 数据来源与隐私
-
-- 数据只来自本机 `~/.dsh/sessions` 下的会话日志，经由 DSH 的 `sessionQuery` 服务读取
-- 统计的是会话事件里的 `assistant/message.usage`（`inputTokens` / `outputTokens` / `cacheReadTokens` / `totalTokens`）
-- **不读取、不转发任何 API key**；不向任何外部服务发请求
-- 只注册一个 loopback（`127.0.0.1`）路由 `/api/dsh-api-usage/summary`，非本机请求返回 403
-- 标题生成、网络搜索这类不记 token 的辅助调用单独计数，不计入 token 合计
-
-## 统计口径
-
-| 字段 | 含义 |
+| 指标 | 含义 |
 | --- | --- |
-| 调用次数 | 记录的模型调用条数（含压缩摘要等非对话调用） |
-| 输入 tokens | 未命中缓存的输入 token（`inputTokens`） |
-| 缓存 tokens | 命中提示缓存的输入 token（`cacheReadTokens`） |
-| 输出 tokens | 模型生成的 token（`outputTokens`） |
-| 合计 tokens | `totalTokens`，即输入 + 缓存 + 输出 |
+| 调用次数 | 会话里记录的模型调用条数（含压缩摘要等非对话调用） |
+| 输入 tokens | 未命中缓存的输入（`inputTokens`） |
+| 缓存 tokens | 命中提示缓存的输入（`cacheReadTokens`） |
+| 输出 tokens | 模型生成（`outputTokens`） |
+| 合计 tokens | `totalTokens` = 输入 + 缓存 + 输出 |
 
-同一个 API 提供方下按模型分行；不同 provider 即使模型同名也分开统计。
+同一 provider 下按模型分行；不同 provider 即使模型同名也分开统计。
 
-## 配置
+### 隐私边界
 
-`cordis.patch.yml` 里的 `config` 可调：
+- 只读本机 `~/.dsh/sessions` 下的会话日志
+- 不读取、不转发任何 API key
+- 不向任何外部服务发请求
+- 只注册一个 `127.0.0.1` 路由，非本机请求直接 403
+
+### 配置
+
+`cordis.patch.yml` 的 `config` 可调，全部有默认值，不改也能用：
 
 ```yaml
 - insert:
     - id: api-usage-dashboard
       name: 'dsh-api-usage-dashboard'
       config:
-        cacheTtlMs: 20000    # 扫描结果缓存毫秒数，0 = 每次请求都重扫
-        maxSessions: 0       # 只扫描最近 N 个会话，0 = 全部
+        cacheTtlMs: 20000    # 扫描结果缓存（毫秒），0 = 每次重扫
+        maxSessions: 0       # 只扫最近 N 个会话，0 = 全部
         scanConcurrency: 4   # 并发读取会话数（1–8）
 ```
 
-首次打开会扫描全部会话日志（本机 23 个会话约 1–2 秒），之后走缓存。
+### 常见问题
 
-## 开发
+**金额（¥）呢？**
+还没做。需要每个 provider 的单价，而自建网关通常不公开牌价；有单价就能加。
 
-无构建步骤，宿主半边是 ESM，浏览器半边是 `window.__ModuleLoader__` 注册的纯 JS 模块：
+**能统计不经过 Harness 的请求吗？**
+不能。它统计的是 Harness 实际发出的模型调用——这也正是"不会算错"的原因。
 
+**会拖慢 DSH 吗？**
+不会。扫描在宿主进程里做、结果按 20 秒缓存，界面每 60 秒取一次。
+
+### 许可证
+
+[MIT](LICENSE)
+
+---
+
+## 🇬🇧 English
+
+### Install it, and the data is already there
+
+A [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (DSH) plugin that adds a **model API usage dashboard** to the sidebar: requests and tokens per provider, per model, per hour.
+
+> No endpoint to configure, no API key to paste, no extra collector to run.
+> It reads Harness's own session records, so **any provider you add later shows up automatically on its first call.**
+
+### Why this one
+
+- **One panel for every provider** instead of switching between vendor consoles that only show a grand total
+- **Zero integration** — no SDK changes, no egress, no agent to deploy, unlike hosted observability platforms
+- **Durable by construction** — it reads the session log, the same source Harness replays from, instead of keeping a parallel counter that can drift
+
+**Nothing leaves your machine**: no outbound requests, no API keys read, one loopback-only route.
+
+### Features
+
+- 🕐 **Full 24-hour axis** (00:00–23:00), empty hours kept as slots so the shape never lies
+- 📅 **Per-day drill-down**: date picker plus the last seven days as quick chips
+- 🖱️ **Interactive bars**: hover for a guide line and a tooltip (time range / tokens / calls), click to pin one for comparison
+- 🔀 **Tokens ⇄ Requests** switch, auto-rounded Y axis (1/2/5×10ⁿ) with gridlines
+- 🎨 **Color-coded series**: blue for tokens, amber for requests; a stable hue per provider and per model, reused across cards, mini charts and the table
+- 📊 **Per-model mini charts** so the heavy hitters are obvious at a glance
+- 🧾 **Breakdown table**: calls, input, cached, output, total and share per provider and model
+- 🌗 Host theme aware, bilingual, refreshes every 60 seconds
+
+### Quick start
+
+1. Clone or copy this repository to a local folder
+2. Install that folder through DSH's plugin manager (`plugin_manager → install_bundle`)
+3. Click the bar-chart icon in the sidebar
+
+The first open scans every session log (about 1–2 s for 23 sessions), then serves from cache.
+
+### What is counted
+
+| Metric | Meaning |
+| --- | --- |
+| Requests | Recorded model calls, including compaction and other non-chat calls |
+| Input tokens | Prompt tokens not served from cache (`inputTokens`) |
+| Cached tokens | Prompt tokens served from cache (`cacheReadTokens`) |
+| Output tokens | Tokens generated by the model (`outputTokens`) |
+| Total tokens | `totalTokens` = input + cached + output |
+
+Models are listed under their provider; the same model name under two providers stays two rows.
+
+### Privacy
+
+- Reads only local session logs under `~/.dsh/sessions`
+- Never reads or forwards an API key
+- Makes no outbound request
+- Registers a single `127.0.0.1` route; non-loopback callers get 403
+
+### Configuration
+
+Every field has a default:
+
+```yaml
+- insert:
+    - id: api-usage-dashboard
+      name: 'dsh-api-usage-dashboard'
+      config:
+        cacheTtlMs: 20000
+        maxSessions: 0
+        scanConcurrency: 4
 ```
-index.js          宿主：聚合 + loopback 路由
-client.js         浏览器：面板与图表
-cordis.patch.yml  Loader 行
-locale/{zh,en}.json  插件管理器显示名与描述
-icon.svg          插件图标
-```
 
-改宿主代码后用 `plugin_manager` 关/开一次插件行即可热重载；改浏览器代码刷新页面。
+### FAQ
 
-## 已知限制
+**Where is the money column?**
+Not implemented: it needs a unit price per provider, and self-hosted gateways rarely publish one. Give it prices and it can be added.
 
-- 只统计经 DSH 发出的模型调用；绕过 Harness 直接调的第三方请求看不到
-- 金额（¥）尚未支持：需要每个 provider 的单价，其中自建网关通常不公开牌价
-- 数据系列使用固定色板（蓝 `#4d6bfe` = Tokens，琥珀 `#f59e0b` = 请求，其余按 provider/模型循环取色），不跟随宿主的强调色；界面其余部分仍走宿主主题 token
+**Does it see traffic that bypasses Harness?**
+No — it counts the calls Harness actually made, which is also why the numbers stay honest.
 
-## 许可证
+**Does it slow DSH down?**
+No. Scanning happens in the host process and its result is cached for 20 seconds.
+
+### License
 
 [MIT](LICENSE)
