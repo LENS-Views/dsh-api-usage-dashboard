@@ -13,6 +13,8 @@
 ![deps](https://img.shields.io/badge/dependencies-0-10b981)
 ![privacy](https://img.shields.io/badge/data-stays%20local-f59e0b)
 
+<img src="https://raw.githubusercontent.com/LENS-Views/dsh-api-usage-dashboard/main/docs/screenshot.png" alt="DSH API usage dashboard: 24-hour token chart, per-model usage and the breakdown table" width="900" />
+
 </div>
 
 ---
@@ -46,9 +48,6 @@
 - 📊 **按模型分组**：每个模型一张 24 小时迷你柱图，看谁在烧 token 一目了然
 - 🧾 **明细表**：provider 汇总 + 模型明细，调用 / 输入 / 缓存 / 输出 / 合计 / 占比一目了然
 - 🌗 跟随宿主主题、中英双语、60 秒自动刷新
-
-<!-- 截图：把图放进 docs/screenshot.png 后，取消下面这行注释 -->
-<!-- ![screenshot](docs/screenshot.png) -->
 
 ### 三步装上
 
