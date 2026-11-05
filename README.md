@@ -13,7 +13,7 @@
 ![deps](https://img.shields.io/badge/dependencies-0-10b981)
 ![privacy](https://img.shields.io/badge/data-stays%20local-f59e0b)
 
-<img src="https://raw.githubusercontent.com/LENS-Views/dsh-api-usage-dashboard/main/docs/screenshot.png" alt="DSH API usage dashboard: 24-hour token chart, per-model usage and the breakdown table" width="900" />
+![DSH API usage dashboard: 24-hour token chart, per-model usage and the breakdown table](https://cdn.jsdelivr.net/gh/LENS-Views/dsh-api-usage-dashboard@main/docs/screenshot.png)
 
 </div>
 
