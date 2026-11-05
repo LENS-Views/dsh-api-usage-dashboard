@@ -5,6 +5,12 @@
   "type": "module",
   "license": "MIT",
   "author": "LENS-Views",
+  "contributors": [
+    {
+      "name": "DSH Agent (deepseek-flash)",
+      "url": "https://github.com/deepseek-ai/deepseek-harness"
+    }
+  ],
   "homepage": "https://github.com/LENS-Views/dsh-api-usage-dashboard#readme",
   "repository": {
     "type": "git",

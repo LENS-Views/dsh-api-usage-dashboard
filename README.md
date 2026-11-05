@@ -100,6 +100,13 @@
 **会拖慢 DSH 吗？**
 不会。扫描在宿主进程里做、结果按 20 秒缓存，界面每 60 秒取一次。
 
+### 作者
+
+- **LENS-Views** — 项目发起、需求与验收、发布
+- **DSH Agent（deepseek-flash）** — 实现：宿主侧用量聚合、面板与图表、发布脚本与文档
+
+本项目在 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的会话里由人类与 AI agent 结对完成：设计与验收归人类，代码与文档由 agent 起草。这也是它存在的原因——想要一个"装完就看见"的用量面板，于是直接在这个 harness 里把它写出来了。
+
 ### 许可证
 
 [MIT](LICENSE)
@@ -185,6 +192,13 @@ No — it counts the calls Harness actually made, which is also why the numbers 
 
 **Does it slow DSH down?**
 No. Scanning happens in the host process and its result is cached for 20 seconds.
+
+### Authors
+
+- **LENS-Views** — project initiator, requirements, review, release
+- **DSH Agent (deepseek-flash)** — implementation: host-side aggregation, panel and charts, publish tooling, documentation
+
+The project was built in a [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) session, pairing a human with an AI agent: the human owns the design decisions and acceptance, the agent drafts the code and docs. That is also why it exists — the fastest way to get a zero-config usage panel was to write one from inside the harness.
 
 ### License
 
