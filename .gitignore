@@ -1,5 +1,7 @@
 node_modules/
 dist/
+.npm-out/
+.secrets/
 *.log
 .DS_Store
 Thumbs.db

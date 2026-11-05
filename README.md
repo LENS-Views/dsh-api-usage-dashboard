@@ -104,6 +104,25 @@
 **会拖慢 DSH 吗？**
 不会。扫描在宿主进程里做、结果按 20 秒缓存，界面每 60 秒取一次。
 
+### 目录与维护脚本
+
+```
+index.js              宿主：用量聚合 + loopback 路由
+client.js             浏览器：面板、图表、双语文案
+cordis.patch.yml      Loader 行
+locale/{zh,en}.json   插件管理器里的显示名与描述
+icon.svg              插件图标
+docs/screenshot.png   README 截图
+tools/                发版脚本（不随 npm 包发布，files 白名单已排除）
+  github-publish.mjs      用 GitHub REST 推送，无需 git 二进制；PNG 等二进制走 blob
+  github-login.mjs        OAuth 设备码登录（比 PAT 更安全的取 token 方式）
+  npm-publish-http.mjs    纯 Node 打 tar.gz 并直接 PUT 到 registry，支持 --otp
+```
+
+凭据统一放在**仓库同级**的 `.secrets/`（`github-token`、`npm-token`），脚本自动读取，也可用 `GITHUB_TOKEN_FILE` / `NPM_TOKEN` 覆盖；`.secrets/`、`.npm-out/` 已写进 `.gitignore`。
+
+改宿主代码后，用插件管理器把 `api-usage-dashboard` 这一行关一次再开，即可热重载；改浏览器代码刷新页面。
+
 ### 作者
 
 - **LENS-Views** — 项目发起、需求与验收、发布
@@ -206,6 +225,25 @@ No — it counts the calls Harness actually made, which is also why the numbers 
 
 **Does it slow DSH down?**
 No. Scanning happens in the host process and its result is cached for 20 seconds.
+
+### Layout and release tooling
+
+```
+index.js              host: usage aggregation + loopback route
+client.js             browser: panel, charts, bilingual copy
+cordis.patch.yml      loader row
+locale/{zh,en}.json   display name and description in the plugin manager
+icon.svg              plugin icon
+docs/screenshot.png   README screenshot
+tools/                release scripts (excluded from the npm package by `files`)
+  github-publish.mjs      pushes through the GitHub REST API, no git binary; binaries go via blobs
+  github-login.mjs        OAuth device-flow login (safer than pasting a PAT)
+  npm-publish-http.mjs    packs with plain Node and PUTs to the registry, supports --otp
+```
+
+Credentials live in `.secrets/` **next to the repo** (`github-token`, `npm-token`); the scripts pick them up automatically and both `GITHUB_TOKEN_FILE` and `NPM_TOKEN` override the paths. `.secrets/` and `.npm-out/` are gitignored.
+
+After changing host code, toggle the `api-usage-dashboard` row off and on to hot-reload it; for browser code, refresh the page.
 
 ### Authors
 
