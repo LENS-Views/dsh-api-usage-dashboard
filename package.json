@@ -1,0 +1,50 @@
+{
+  "name": "dsh-api-usage-dashboard",
+  "version": "1.0.0",
+  "description": "DSH plugin: an API usage dashboard panel with a 24-hour bar chart, per-day drill-down and per-model breakdown, aggregated from local session logs.",
+  "type": "module",
+  "license": "MIT",
+  "author": "LENS-Views",
+  "homepage": "https://github.com/LENS-Views/dsh-api-usage-dashboard#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LENS-Views/dsh-api-usage-dashboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/LENS-Views/dsh-api-usage-dashboard/issues"
+  },
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "dsh-plugin",
+    "dashboard",
+    "usage",
+    "tokens",
+    "api-metrics"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  }
+}

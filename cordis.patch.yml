@@ -1,0 +1,9 @@
+# dsh-api-usage-dashboard bundle patch: inserts one dual-face plugin row into
+# the profile roster. The host half (exports ".") registers the usage route;
+# `dsh.client` in package.json loads the browser half (exports "./client"),
+# which adds the sidebar panel icon and its dashboard page.
+- insert:
+    - id: api-usage-dashboard
+      name: 'dsh-api-usage-dashboard'
+      config:
+        cacheTtlMs: 20000

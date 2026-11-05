@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "API Usage Dashboard",
+    "description": "A dashboard panel that monitors model API usage — requests, input and output tokens per provider and model — across every Harness session."
+  }
+}

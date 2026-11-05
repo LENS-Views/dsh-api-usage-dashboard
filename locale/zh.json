@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "API 用量仪表盘",
+    "description": "仪表盘面板：按 provider 与模型统计各模型接口的调用次数与输入 / 输出 token，覆盖本机全部会话。"
+  }
+}
