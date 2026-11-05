@@ -57,7 +57,8 @@
 
 首次打开会扫一遍全部会话日志（23 个会话约 1–2 秒），之后走缓存，基本秒开。
 
-> 不想用 npm 也行：把仓库拷到本地，用目录路径安装，效果一样。
+> 不想用 npm 也行：把仓库拷到本地用目录路径安装，或者直接填 git 地址
+> `github:LENS-Views/dsh-api-usage-dashboard`（本仓库 public，无需构建步骤）。
 
 ### 统计口径
 
@@ -159,7 +160,8 @@ dsh-api-usage-dashboard
 
 The first open scans every session log (about 1–2 s for 23 sessions), then serves from cache.
 
-> No npm needed: copy the repository locally and install that folder instead.
+> No npm needed: install the folder directly, or point `install_bundle` at
+> `github:LENS-Views/dsh-api-usage-dashboard` (public repo, no build step).
 
 ### What is counted
 
