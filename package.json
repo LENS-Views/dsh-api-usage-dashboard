@@ -7,11 +7,11 @@
   "author": "LENS-Views",
   "contributors": [
     {
-      "name": "DSH Agent (deepseek-flash)",
-      "url": "https://github.com/deepseek-ai/deepseek-harness"
+      "name": "DSH Agent (deepseek-flash)"
     }
   ],
   "homepage": "https://github.com/LENS-Views/dsh-api-usage-dashboard#readme",
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/LENS-Views/dsh-api-usage-dashboard.git"

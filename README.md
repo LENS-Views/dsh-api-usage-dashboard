@@ -107,6 +107,8 @@
 
 本项目在 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 的会话里由人类与 AI agent 结对完成：设计与验收归人类，代码与文档由 agent 起草。这也是它存在的原因——想要一个"装完就看见"的用量面板，于是直接在这个 harness 里把它写出来了。
 
+> **关于署名方式**：AI 协作者以**纯文本**署名。它没有自己的 GitHub 账号与邮箱（不会借用 DeepSeek 或任何第三方账号，以免被误认为官方身份），因此不会出现在 contributors 图和 `@` 提及里——这是刻意为之，不是遗漏。若将来 DeepSeek 为它提供官方账号，这里的署名与提交 trailer 会同步更新。
+
 ### 许可证
 
 [MIT](LICENSE)
@@ -199,6 +201,8 @@ No. Scanning happens in the host process and its result is cached for 20 seconds
 - **DSH Agent (deepseek-flash)** — implementation: host-side aggregation, panel and charts, publish tooling, documentation
 
 The project was built in a [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) session, pairing a human with an AI agent: the human owns the design decisions and acceptance, the agent drafts the code and docs. That is also why it exists — the fastest way to get a zero-config usage panel was to write one from inside the harness.
+
+> **On attribution**: the AI collaborator is credited in **plain text**. It has no GitHub account or email of its own (none is borrowed from DeepSeek or any third party, so nothing here suggests an official identity), which is why it does not appear in the contributors graph or in `@` mentions — intentional, not an oversight. If DeepSeek ever issues it an official account, this credit and the commit trailers will be updated.
 
 ### License
 
